@@ -7,15 +7,21 @@ import {
 } from "./ui/popover";
 import { Button } from "./ui/button";
 import { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "@/app/utils/firebaseConfig";
+import { Input } from "./ui/input";
+import { addNote } from "../utils/storage/notes";
 
 export default function AddNote() {
   const [note, setNote] = useState("");
+  const [title, setTitle] = useState("");
 
   const handleAddNote = async () => {
-    
+    const noteObj = {
+      title: title,
+      content: note,
+    };
+    addNote(noteObj);
   }
+  
   return (
     <div>
       <Popover>
@@ -23,6 +29,12 @@ export default function AddNote() {
           <h3>Add Note</h3>
         </PopoverTrigger>
         <PopoverContent>
+          <Input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
           <Textarea
             placeholder="Type your message here."
             value={note}
