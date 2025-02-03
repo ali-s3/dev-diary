@@ -11,39 +11,67 @@ import { Input } from "./ui/input";
 import { addNote } from "../utils/storage/notes";
 
 export default function AddNote() {
-  const [note, setNote] = useState("");
+  const [content, setNote] = useState("");
   const [title, setTitle] = useState("");
+  const [titleError, setTitleError] = useState("");
+
+  const validateTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length <= 0) {
+      setTitleError("Title is required");
+    } else {
+      setTitleError("");
+    }
+  }
 
   const handleAddNote = async () => {
-    const noteObj = {
+    if (title.length <= 0) {
+      return;
+    }
+    addNote({
       title: title,
-      content: note,
-    };
-    addNote(noteObj);
+      content: content,
+    });
   }
-  
+
+
+
   return (
-    <div>
-      <Popover>
-        <PopoverTrigger>
-          <h3>Add Note</h3>
+    <div className="sticky">
+      <Popover onOpenChange={(open) => { console.log(open) }}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="border border-primary rounded-2xl p-2 cursor-pointer w-full">
+            New Note
+          </Button>
         </PopoverTrigger>
-        <PopoverContent>
-          <Input
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <Textarea
-            placeholder="Type your message here."
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-          />
-          <Button
-            variant="outline"
-            onClick={handleAddNote}
-          >Add Note</Button>
+        <PopoverContent className="w-[96vw] border border-primary">
+          <div className="flex flex-col gap-2">
+            <Input
+              className="border border-primary"
+              type="text"
+              placeholder="Title"
+              required
+              value={title}
+              onChange={(e) => { validateTitle(e); setTitle(e.target.value) }}
+            />
+            <div className="text-red-500 text-sm">{titleError}</div>
+            <Textarea
+              className="h-60 border border-primary"
+              placeholder="Type your message here."
+              value={content}
+              onChange={(e) => setNote(e.target.value)}
+            />
+            {/* todo: press enter to add note */}
+            <Button
+              variant="outline"
+              className="border border-primary rounded-2xl cursor-pointer"
+              onClick={handleAddNote}
+              onKeyDown={(e) => {
+                e.preventDefault();
+                if (e.key === 'Enter')
+                  handleAddNote();
+              }}
+            >Add Note</Button>
+          </div>
         </PopoverContent>
       </Popover>
 

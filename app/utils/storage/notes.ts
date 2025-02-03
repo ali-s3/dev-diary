@@ -1,17 +1,27 @@
-// todo: note object
-// todo: add note to firestore
-import { collection, addDoc } from "firebase/firestore";
+// todo: display all notes, view selected note
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "@/app/utils/firebaseConfig";
+import { Note } from "@/types/globals";
 
-const addNote = async (note: { title: string; content: string }) => {
+const addNote = async (note: {title: string, content: string}) => {
     try {
         const docRef = await addDoc(collection(db, "notes"), {
             note: note,
         });
-        console.log("Document written with ID: ", docRef.id);
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 };
 
-export { addNote };
+const getNotes = async (): Promise<Note[]> => {
+    const querySnapshot = await getDocs(collection(db, "notes"));
+    return querySnapshot.docs.map((doc) => {
+        return {
+            id: doc.id,
+            title: doc.data().note.title,
+            content: doc.data().note.content,
+        };
+    });
+}
+
+export { addNote, getNotes };
