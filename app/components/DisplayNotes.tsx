@@ -13,7 +13,7 @@ import DeleteNote from "./DeleteNote";
 
 export default function DisplayNotes() {
     const [notes, setNotes] = useState<Note[]>([]);
-    const [loading, setLoading] = useState<Boolean>(true);
+    const [loading, setLoading] = useState<boolean>(true);
 
     // the best way to refresh note fethcing is to use SWR
     useEffect(() => {

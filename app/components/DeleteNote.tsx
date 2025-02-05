@@ -3,7 +3,7 @@ import { Note } from "@/types/globals";
 import { useState } from "react";
 import { deleteNote } from "../utils/storage/notes";
 export default function DeleteNote({ note }: { note: Note }) {
-    const [deleteLoading, setDeleteLoading] = useState<Boolean>(false);
+    const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
     const handleDeleteNote = async () => {
         // console.log("delete note: ", note.id);
         setDeleteLoading(true);
@@ -17,11 +17,14 @@ export default function DeleteNote({ note }: { note: Note }) {
         }
     }
     return (
-        <div>
-            <Button
-                variant={"destructive"}
-                onClick={() => handleDeleteNote()}
-            >Delete</Button>
-        </div>
+        <>
+            {deleteLoading ? (<div>Deleting...</div>) :
+                (<div>
+                    <Button
+                        variant={"destructive"}
+                        onClick={() => handleDeleteNote()}
+                    >Delete</Button>
+                </div>)}
+        </>
     )
 }

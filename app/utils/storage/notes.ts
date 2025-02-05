@@ -5,7 +5,7 @@ import { Note } from "@/types/globals";
 
 const addNote = async (note: { title: string, content: string }) => {
     try {
-        const docRef = await addDoc(collection(db, "notes"), {
+        await addDoc(collection(db, "notes"), {
             note: note,
         });
     } catch (e) {

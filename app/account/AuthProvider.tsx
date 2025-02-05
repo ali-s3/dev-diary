@@ -1,8 +1,8 @@
 "use client";
 import { UserContext } from "../utils/authentication/UserContext";
-import Account from "./page";
+// import Account from "./page";
 import { ReactNode, useContext } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
     const {user} = useContext(UserContext);
