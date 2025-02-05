@@ -9,6 +9,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "./ui/accordion";
+import DeleteNote from "./DeleteNote";
 
 export default function DisplayNotes() {
     const [notes, setNotes] = useState<Note[]>([]);
@@ -35,15 +36,20 @@ export default function DisplayNotes() {
     return (
         <div>
             {notes.map((note) => (
-                <div key={note.id} className=" p-2 my-12">
-                    <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value={note.id}>
-                            <AccordionTrigger>{note.title}</AccordionTrigger>
-                            <AccordionContent>
-                                {note.content}
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
+                <div key={note.id} className="flex items-center gap-2">
+                    <div className="grow p-2 my-12">
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value={note.id}>
+                                <AccordionTrigger>{note.title}</AccordionTrigger>
+                                <AccordionContent>
+                                    {note.content}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+                    <div className="shrink">
+                        <DeleteNote note={note} />
+                    </div>
                 </div>
             ))}
         </div>

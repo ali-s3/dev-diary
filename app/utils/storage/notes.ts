@@ -1,9 +1,9 @@
 // todo: display all notes, view selected note
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/app/utils/firebaseConfig";
 import { Note } from "@/types/globals";
 
-const addNote = async (note: {title: string, content: string}) => {
+const addNote = async (note: { title: string, content: string }) => {
     try {
         const docRef = await addDoc(collection(db, "notes"), {
             note: note,
@@ -23,5 +23,11 @@ const getNotes = async (): Promise<Note[]> => {
         };
     });
 }
+
+export const deleteNote = async (id: string): Promise<string> =>
+    deleteDoc(doc(db, "notes", id))
+        .then(() => Promise.resolve("Document successfully deleted!"))
+        .catch((error) => Promise.reject(`Error deleting document! ${error}`));
+
 
 export { addNote, getNotes };

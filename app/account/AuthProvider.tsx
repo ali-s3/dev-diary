@@ -10,13 +10,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     
     if (!isAuthenticated) {
         console.log("User is not authenticated. Redirecting to account page.");
-        useRouter().push("/account");
+        // useRouter().push("/account");
     }
     console.log("User is authenticated. Displaying children.", user);
 
     return (
         <>
-            {isAuthenticated && (
+            {!isAuthenticated && (
                 <UserContext.Provider value={{user}}>
                     {children}
                 </UserContext.Provider>
