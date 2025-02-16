@@ -3,10 +3,12 @@
 import AuthProvider from "./account/AuthProvider";
 import AddNote from "./components/AddNote";
 import DisplayNotes from "./components/DisplayNotes";
+import FileEditor from "./components/FileEditor";
 
 export default function Home() {
   return (
     <AuthProvider>
+      <FileEditor />
       <AddNote />
       <DisplayNotes />
     </AuthProvider>
