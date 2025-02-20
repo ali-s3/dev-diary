@@ -1,74 +1,77 @@
 "use client";
-import { UncontrolledTreeEnvironment, Tree, StaticTreeDataProvider } from 'react-complex-tree';
+import { useMemo } from 'react';
+import { UncontrolledTreeEnvironment, Tree, TreeDataProvider, TreeItemIndex, TreeItem } from 'react-complex-tree';
 import 'react-complex-tree/lib/style-modern.css';
+import { longTree } from '@/app/utils/storage/FileTree';
 
-const items = {
-  root: {
-    index: 'root',
-    canMove: true,
-    isFolder: true,
-    children: ['child1', 'child2', 'child3'],
-    data: 'Root item',
-    canRename: true,
-  },
-  child1: {
-    index: 'child1',
-    canMove: true,
-    isFolder: false,
-    children: [],
-    data: 'Child item 1',
-    canRename: true,
-  },
-  child2: {
-    index: 'child2',
-    canMove: true,
-    isFolder: false,
-    children: [],
-    data: 'Child item 2',
-    canRename: true,
-  },
-  child3: {
-    index: 'child3',
-    canMove: true,
-    isFolder: true,
-    children: ['file1', 'file2', 'file3'],
-    data: 'Child item 3',
-    canRename: true,
-  },
-  file1: {
-    index: 'file1',
-    canMove: true,
-    isFolder: false,
-    children: [],
-    data: 'file1',
-    canRename: true,
-  },
-  file2: {
-    index: 'file2',
-    canMove: true,
-    isFolder: false,
-    children: [],
-    data: 'file2',
-    canRename: true,
-  },
-  file3: {
-    index: 'file3',
-    canMove: true,
-    isFolder: false,
-    children: [],
-    data: 'file3',
-    canRename: true,
-  },
-};
+class CustomDataProviderImplementation implements TreeDataProvider {
+  private data: Record<TreeItemIndex, TreeItem> = { longTree };
+
+  private treeChangeListeners: ((changedItemIds: TreeItemIndex[]) => void)[] =
+    [];
+
+  public async getTreeItem(itemId: TreeItemIndex) {
+    return this.data[itemId];
+  }
+
+  public async onChangeItemChildren(
+    itemId: TreeItemIndex,
+    newChildren: TreeItemIndex[]
+  ) {
+    this.data[itemId].children = newChildren;
+    this.treeChangeListeners.forEach(listener => listener([itemId]));
+  }
+
+  // public onDidChangeTreeData(
+  //   listener: (changedItemIds: TreeItemIndex[]) => void
+  // ): Disposable {
+  //   this.treeChangeListeners.push(listener);
+  //   return {
+  //     dispose: () =>
+  //       this.treeChangeListeners.splice(
+  //         this.treeChangeListeners.indexOf(listener),
+  //         1
+  //       ),
+  //   };
+  // }
+
+  public async onRenameItem(item: TreeItem<any>, name: string): Promise<void> {
+    this.data[item.index].data = name;
+  }
+
+  // custom handler for directly manipulating the tree data
+  public injectItem(name: string) {
+    const rand = `${Math.random()}`;
+    this.data[rand] = { data: name, index: rand } as TreeItem;
+    this.data.root.children?.push(rand);
+    this.treeChangeListeners.forEach(listener => listener(['root']));
+  }
+}
 
 export default function FileTree() {
+  const dataProvider = new CustomDataProviderImplementation();
   return (
     <UncontrolledTreeEnvironment
-      dataProvider={new StaticTreeDataProvider(items, (item, data) => ({ ...item, data }))}
+      canDragAndDrop
+      canDropOnFolder
+      canReorderItems
+      dataProvider={dataProvider}
       getItemTitle={item => item.data}
-      viewState={{}}
+      viewState={{
+        'tree-2': {
+          expandedItems: [],
+        },
+      }}
     >
-      <Tree treeId="tree-1" rootItem="root" treeLabel="Tree Example" />
+      <button
+        type="button"
+        onClick={() =>
+          dataProvider.injectItem(window.prompt('Item name') || 'New item')
+        }
+      >
+        Inject item
+      </button>
+      <Tree treeId="tree-2" rootItem="root" treeLabel="Tree Example" />
     </UncontrolledTreeEnvironment>
-  )
+  );
 }
