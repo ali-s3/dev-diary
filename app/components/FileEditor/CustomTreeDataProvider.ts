@@ -34,11 +34,24 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
         this.data[item.index].data = name;
     }
 
+    // // Function to get the focused item for a specific tree
+    // getFocusedItem(treeId: string): TreeItemIndex | undefined {
+    //     const treeViewState = viewState[treeId];
+    //     return treeViewState?.focusedItem;
+    // }
     // custom handler for directly manipulating the tree data
     public injectItem(name: string) {
         console.log('data: ', this.data);
         const rand = `${Math.random()}`;
         this.data[rand] = { data: name, index: rand } as TreeItem;
+        this.data.root.children?.push(rand); // this means that if the root has children, push the new item to the children array
+        this.treeChangeListeners.forEach(listener => listener(['root']));
+    }
+
+    // custom handler for directly manipulating the tree data
+    public injectFolder(name: string) {
+        const rand = `${Math.random()}`;
+        this.data[rand] = { data: name, index: rand, children: [], isFolder: true } as TreeItem;
         this.data.root.children?.push(rand); // this means that if the root has children, push the new item to the children array
         this.treeChangeListeners.forEach(listener => listener(['root']));
     }
