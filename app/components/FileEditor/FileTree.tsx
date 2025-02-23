@@ -2,19 +2,19 @@
 import { UncontrolledTreeEnvironment, Tree, TreeItem, TreeItemIndex, TreeEnvironmentRef } from 'react-complex-tree';
 import 'react-complex-tree/lib/style-modern.css';
 import CustomTreeDataProvider from './CustomTreeDataProvider';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function FileTree() {
   const [focusedItem, setFocusedItem] = useState<TreeItem | null>(null);
-  const dataProvider = new CustomTreeDataProvider();
-  const ref = useRef<TreeEnvironmentRef>(null);
+  const dataProvider = useMemo(() => new CustomTreeDataProvider(), []);
 
-  console.log('focused item: ', ref.current?.viewState['tree-1']?.focusedItem);
-
+  const addItem = (isFolder: boolean) => {
+    const name = window.prompt('Item name') || 'New item';
+    dataProvider.injectItem(isFolder, name, focusedItem)
+  }
   return (
     <div className='rct-dark'>
       <UncontrolledTreeEnvironment
-        ref={ref}
         canDragAndDrop={true}
         canDropOnFolder={true}
         canReorderItems={true}
@@ -29,20 +29,22 @@ export default function FileTree() {
       >
         <button
           type="button"
-          onClick={() =>
-            dataProvider.injectItem(window.prompt('Item name') || 'New item')
+          onClick={() => addItem(false)
           }
         >
           Add File
         </button>
-        {/* Inject folder */}
         <button
           type="button"
-          onClick={() =>
-            dataProvider.injectFolder(window.prompt('Folder name') || 'New folder')
-          }
+          onClick={() => addItem(true)}
         >
           Add Folder
+        </button>
+        <button
+          type="button"
+          onClick={() => dataProvider.deleteItem(focusedItem?.index)}
+        >
+          Delete
         </button>
         <Tree treeId="tree-1" rootItem="root" treeLabel="Tree Example" />
       </UncontrolledTreeEnvironment>
