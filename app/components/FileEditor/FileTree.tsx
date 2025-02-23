@@ -42,7 +42,11 @@ export default function FileTree() {
         </button>
         <button
           type="button"
-          onClick={() => dataProvider.deleteItem(focusedItem?.index)}
+          onClick={() => {
+            focusedItem?.index ?
+              dataProvider.deleteItem(focusedItem?.index)
+              : alert('please select an item to delete')
+          }}
         >
           Delete
         </button>

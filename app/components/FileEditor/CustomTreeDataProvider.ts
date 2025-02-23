@@ -36,24 +36,23 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
         this.data[item.index].data = name;
     }
 
-    public injectItem(isFolder: boolean, name: string, focusedItem: TreeItem | null) {
-        const item: TreeItem = { data: name, index: name, children: isFolder ? [] : undefined, isFolder: isFolder };
+    public injectItem(isFolder: boolean, index: string, focusedItem: TreeItem | null) {
+        const item: TreeItem = { data: index, index: index, children: isFolder ? [] : undefined, isFolder: isFolder };
         if (focusedItem) {
             if (focusedItem.isFolder) {
                 this.data[focusedItem.index].children?.push(item.index);
             }
         } else {
-            this.data.root.children?.push(name);
+            this.data.root.children?.push(index);
         }
-        this.data[name] = item;
+        this.data[index] = item;
         this.treeChangeListeners.forEach(listener => listener(['root']));
     }
 
-    public deleteItem(index: TreeItemIndex | undefined) {
-        //TODO: delete also from root and then update the listner [root, index] as required
-        console.log(index);
-        this.data = Object.fromEntries(Object.entries(this.data).filter(([key, value]) => key != index));
-        console.log(this.data);
+    public deleteItem(index: TreeItemIndex) {
+        // TODO: update the listner with index as the parent name/index
+        this.data = Object.fromEntries(Object.entries(this.data).filter(([itemIndex, _]) => itemIndex != index));
+        this.data['root'].children = this.data['root'].children?.filter(childrenIndex => childrenIndex != index);
         this.treeChangeListeners.forEach(listener => listener(['root']));
     }
 }
