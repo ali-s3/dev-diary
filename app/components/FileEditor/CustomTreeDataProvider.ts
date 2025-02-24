@@ -49,10 +49,15 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
         this.treeChangeListeners.forEach(listener => listener(['root']));
     }
 
-    public deleteItem(index: TreeItemIndex) {
-        // TODO: update the listner with index as the parent name/index
-        this.data = Object.fromEntries(Object.entries(this.data).filter(([itemIndex, _]) => itemIndex != index));
-        this.data['root'].children = this.data['root'].children?.filter(childrenIndex => childrenIndex != index);
-        this.treeChangeListeners.forEach(listener => listener(['root']));
+    public deleteItem(focusedItemIndex: TreeItemIndex, expandedItemsIndexes: TreeItemIndex[] | []) {
+        console.log('data before: ', this.data);
+        this.data = Object.fromEntries(Object.entries(this.data).filter(([itemIndex, _]) => itemIndex != focusedItemIndex));
+        this.data['root'].children = this.data['root'].children?.filter(childrenIndex => childrenIndex != focusedItemIndex);
+        expandedItemsIndexes = expandedItemsIndexes?.filter(expandedItemIndex => expandedItemIndex != focusedItemIndex);
+        // expandedItemsIndexes.push('root');
+        console.log('exp: , foc: ', expandedItemsIndexes, focusedItemIndex);
+        console.log('data: ', this.data);
+        // this.treeChangeListeners.forEach(listener => listener(expandedItemsIndexes));
+        console.log('data now: ', this.data);
     }
 }
