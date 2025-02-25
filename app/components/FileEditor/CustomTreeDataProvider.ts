@@ -5,9 +5,7 @@ import { Key } from 'lucide-react';
 
 export default class CustomTreeDataProvider implements TreeDataProvider {
     private data: Record<TreeItemIndex, TreeItem> = { ...longTree.items };
-    constructor() { console.log('initialized') }
-    private treeChangeListeners: ((changedItemIds: TreeItemIndex[]) => void)[] =
-        [];
+    private treeChangeListeners: ((changedItemIds: TreeItemIndex[]) => void)[] = [];
 
     public async getTreeItem(itemId: TreeItemIndex) {
         return this.data[itemId];
@@ -50,14 +48,12 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
     }
 
     public deleteItem(focusedItemIndex: TreeItemIndex, expandedItemsIndexes: TreeItemIndex[] | []) {
-        console.log('data before: ', this.data);
         this.data = Object.fromEntries(Object.entries(this.data).filter(([itemIndex, _]) => itemIndex != focusedItemIndex));
         this.data['root'].children = this.data['root'].children?.filter(childrenIndex => childrenIndex != focusedItemIndex);
         expandedItemsIndexes = expandedItemsIndexes?.filter(expandedItemIndex => expandedItemIndex != focusedItemIndex);
-        // expandedItemsIndexes.push('root');
+        expandedItemsIndexes.push('root');
         console.log('exp: , foc: ', expandedItemsIndexes, focusedItemIndex);
-        console.log('data: ', this.data);
-        // this.treeChangeListeners.forEach(listener => listener(expandedItemsIndexes));
-        console.log('data now: ', this.data);
+        this.treeChangeListeners.forEach(listener => listener(expandedItemsIndexes));
+        this.onDidChangeTreeData(listener => expandedItemsIndexes);
     }
 }

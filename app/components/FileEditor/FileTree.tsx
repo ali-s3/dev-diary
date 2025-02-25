@@ -17,20 +17,41 @@ export default function FileTree() {
   }
 
   const onDeleteItem = () => {
-    const expandedItemsIndexes = expandedItems.flatMap(expandedItem => expandedItem.index);
-    let focusedItemFromTree = treeRef.current?.viewState ? Object.values(treeRef.current.viewState)[0]?.focusedItem : null;
+    // const expandedItemsIndexes = expandedItems.flatMap(expandedItem => expandedItem.index);
+    let expandedItemsIndexes = null;
+    let focusedItemFromTree = null;
     let indexToDelete = null;
 
-    if (focusedItem?.index)
-      indexToDelete = focusedItem.index;
-    else if (focusedItemFromTree)
+    if (treeRef.current?.viewState) {
+      focusedItemFromTree = Object.values(treeRef.current.viewState)[0]?.focusedItem;
+      expandedItemsIndexes = Object.values(treeRef.current.viewState)[0]?.expandedItems;
+    }
+
+    console.log('expanded before: ', expandedItemsIndexes);
+    // if (focusedItem?.index)
+    // indexToDelete = focusedItem.index;
+    if (focusedItemFromTree)
       indexToDelete = focusedItemFromTree;
 
-    indexToDelete ? dataProvider.deleteItem(indexToDelete, expandedItemsIndexes) :
+    indexToDelete ? dataProvider.deleteItem(indexToDelete, expandedItemsIndexes ?? []) :
       alert('please select an item to delete');
+
     // remove the focused item from the viewState expandedItems array
-    setExpandedItems(expandedItems.filter(expandedItem => expandedItem.index != focusedItem?.index));
+    expandedItemsIndexes = expandedItemsIndexes?.filter(expandedItemIndex => expandedItemIndex != focusedItemFromTree);
+    if (treeRef.current?.viewState && Object.values(treeRef.current.viewState)[0]) {
+      const firstViewState = Object.values(treeRef.current.viewState)[0];
+      if (firstViewState) {
+        firstViewState.expandedItems = expandedItemsIndexes;
+        console.log('updated the expanded in tree');
+      }
+    }
+    console.log('expanded after: ', expandedItemsIndexes);
   }
+
+  useEffect(() => {
+    let expandedItemsFromTree = treeRef.current?.viewState ? Object.values(treeRef.current.viewState)[0]?.expandedItems : null;
+    console.log('local, tree:::: ', expandedItems, expandedItemsFromTree)
+  }, [expandedItems])
 
   return (
     <div className='rct-dark'>
@@ -42,14 +63,14 @@ export default function FileTree() {
         canRename={true}
         dataProvider={dataProvider}
         getItemTitle={item => item.data}
-        onFocusItem={item => {
-          console.log('focus was called: ', item.index);
-          setFocusedItem(item);
-        }}
+        // onFocusItem={item => {
+        //   console.log('focus was called: ', item.index);
+        //   // setFocusedItem(item);
+        // }}
         onExpandItem={(item => setExpandedItems(prevItems => [...prevItems, item]))}
         viewState={{
           'tree-1': {
-            expandedItems: expandedItems.flatMap(expandedItem => expandedItem.index),
+            expandedItems: [],
             focusedItem: focusedItem?.index
           }
         }}
