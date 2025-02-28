@@ -7,7 +7,7 @@ import { useMemo, useRef, useState } from 'react';
 export default function FileTree() {
   const dataProvider = useMemo(() => new CustomTreeDataProvider(), []);
   const treeRef = useRef<TreeEnvironmentRef>(null);
-  const [focusedItem, setFocusedItem] = useState<TreeItem | null>(null);
+  const [focusedItem, setFocusedItem] = useState<TreeItem | null>(dataProvider.firstItem);
 
   const addItem = (isFolder: boolean) => {
     const name = window.prompt('Item name') || 'New item';
@@ -58,7 +58,7 @@ export default function FileTree() {
         viewState={{
           'tree-1': {
             expandedItems: [],
-            focusedItem: dataProvider.firstItem
+            focusedItem: focusedItem?.index
           }
         }}
       >

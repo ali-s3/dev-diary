@@ -5,8 +5,9 @@ import { Key } from 'lucide-react';
 
 export default class CustomTreeDataProvider implements TreeDataProvider {
     private data: Record<TreeItemIndex, TreeItem> = { ...longTree.items };
+    public firstItem = Object.values(this.data)[1];
+
     private treeChangeListeners: ((changedItemIds: TreeItemIndex[]) => void)[] = [];
-    public firstItem = Object.keys(this.data)[1];
 
     public async getTreeItem(itemId: TreeItemIndex) {
         return this.data[itemId];
@@ -21,7 +22,7 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
     }
 
     public onDidChangeTreeData(listener: (changedItemIds: TreeItemIndex[]) => void): Disposable {
-        console.log('i was called');
+        console.log('i was called: ', this.firstItem);
         this.treeChangeListeners.push(listener);
         return {
             dispose: () =>
@@ -54,7 +55,6 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
         this.data = Object.fromEntries(Object.entries(this.data).filter(([itemIndex, _]) => itemIndex != focusedItemIndex));
         this.data['root'].children = this.data['root'].children?.filter(childrenIndex => childrenIndex != focusedItemIndex);
         expandedItemsIndexes = expandedItemsIndexes?.filter(expandedItemIndex => expandedItemIndex != focusedItemIndex);
-        expandedItemsIndexes.push('root');
         console.log('exp: , foc: ', expandedItemsIndexes, focusedItemIndex);
         this.treeChangeListeners.forEach(listener => listener(expandedItemsIndexes));
     }
