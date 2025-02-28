@@ -17,6 +17,7 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
         itemId: TreeItemIndex,
         newChildren: TreeItemIndex[]
     ) {
+        console.log('i was called1111: ');
         this.data[itemId].children = newChildren;
         this.treeChangeListeners.forEach(listener => listener([itemId]));
     }
@@ -56,6 +57,32 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
         this.data['root'].children = this.data['root'].children?.filter(childrenIndex => childrenIndex != focusedItemIndex);
         expandedItemsIndexes = expandedItemsIndexes?.filter(expandedItemIndex => expandedItemIndex != focusedItemIndex);
         console.log('exp: , foc: ', expandedItemsIndexes, focusedItemIndex);
+        // Notify the listeners about the change
+        this.treeChangeListeners.forEach(listener => listener(expandedItemsIndexes));
+        console.log('this data1: ', this.data);
+        this.deleteItem2(focusedItemIndex, expandedItemsIndexes);
+    }
+
+    public deleteItem2(focusedItemIndex: TreeItemIndex, expandedItemsIndexes: TreeItemIndex[] | []) {
+        // Find the parent of the item to be deleted
+        const parentItem = Object.values(this.data).find(item => item.children?.includes(focusedItemIndex));
+        console.log('parentItem: ', parent)
+        // Remove the item from the data
+        this.data = Object.fromEntries(Object.entries(this.data).filter(([itemIndex, _]) => itemIndex != focusedItemIndex));
+
+        // Remove the item from the parent's children
+        if (parentItem) {
+            parentItem.children = parentItem.children?.filter(childrenIndex => childrenIndex != focusedItemIndex);
+        }
+
+        console.log('this data2: ', this.data);
+
+        // Remove the item from the expanded items
+        expandedItemsIndexes = expandedItemsIndexes?.filter(expandedItemIndex => expandedItemIndex != focusedItemIndex);
+
+        console.log('exp: , foc: ', expandedItemsIndexes, focusedItemIndex);
+
+        // Notify the listeners about the change
         this.treeChangeListeners.forEach(listener => listener(expandedItemsIndexes));
     }
 }
