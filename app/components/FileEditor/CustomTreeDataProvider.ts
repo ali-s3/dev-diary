@@ -40,6 +40,13 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
 
     public injectItem(isFolder: boolean, index: string, focusedItem: TreeItem | null) {
         const item: TreeItem = { data: index, index: index, children: isFolder ? [] : undefined, isFolder: isFolder };
+
+        // check if same name item is exisitng
+        if (Object.keys(this.data).find(itemIndex => itemIndex == index)) {
+            alert('Item with same name already exists');
+            return;
+        }
+
         if (focusedItem) {
             if (focusedItem.isFolder) {
                 this.data[focusedItem.index].children?.push(item.index);
@@ -53,20 +60,8 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
     }
 
     public deleteItem(focusedItemIndex: TreeItemIndex, expandedItemsIndexes: TreeItemIndex[] | []) {
-        this.data = Object.fromEntries(Object.entries(this.data).filter(([itemIndex, _]) => itemIndex != focusedItemIndex));
-        this.data['root'].children = this.data['root'].children?.filter(childrenIndex => childrenIndex != focusedItemIndex);
-        expandedItemsIndexes = expandedItemsIndexes?.filter(expandedItemIndex => expandedItemIndex != focusedItemIndex);
-        console.log('exp: , foc: ', expandedItemsIndexes, focusedItemIndex);
-        // Notify the listeners about the change
-        this.treeChangeListeners.forEach(listener => listener(expandedItemsIndexes));
-        console.log('this data1: ', this.data);
-        this.deleteItem2(focusedItemIndex, expandedItemsIndexes);
-    }
-
-    public deleteItem2(focusedItemIndex: TreeItemIndex, expandedItemsIndexes: TreeItemIndex[] | []) {
         // Find the parent of the item to be deleted
         const parentItem = Object.values(this.data).find(item => item.children?.includes(focusedItemIndex));
-        console.log('parentItem: ', parent)
         // Remove the item from the data
         this.data = Object.fromEntries(Object.entries(this.data).filter(([itemIndex, _]) => itemIndex != focusedItemIndex));
 
@@ -75,12 +70,8 @@ export default class CustomTreeDataProvider implements TreeDataProvider {
             parentItem.children = parentItem.children?.filter(childrenIndex => childrenIndex != focusedItemIndex);
         }
 
-        console.log('this data2: ', this.data);
-
         // Remove the item from the expanded items
         expandedItemsIndexes = expandedItemsIndexes?.filter(expandedItemIndex => expandedItemIndex != focusedItemIndex);
-
-        console.log('exp: , foc: ', expandedItemsIndexes, focusedItemIndex);
 
         // Notify the listeners about the change
         this.treeChangeListeners.forEach(listener => listener(expandedItemsIndexes));
